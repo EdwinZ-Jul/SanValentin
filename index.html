@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Brisa ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #ffd6e8 0%, #ffc4d6 50%, #ffb3c6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Animación de corazones flotantes */
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.6;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Pantalla inicial */
+        .initial-screen {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .initial-screen h1 {
+            color: #e91e63;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(233, 30, 99, 0.2);
+        }
+
+        .initial-screen p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff6b9d 0%, #e91e63 100%);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .btn-no:hover {
+            transform: translate(50px, -20px);
+        }
+
+        /* Pantalla de sobres */
+        .envelope-screen {
+            display: none;
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 10;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .envelope-screen h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .envelope-screen .subtitle {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .envelopes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .envelope {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .envelope:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(233, 30, 99, 0.3);
+        }
+
+        .envelope-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .envelope-title {
+            color: #e91e63;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .envelope-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .envelope.opened {
+            background: linear-gradient(135deg, #ffe5f0 0%, #ffd6e8 100%);
+        }
+
+        /* Modal del sobre */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            color: #e91e63;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-content p, .modal-content ul, .modal-content li {
+            color: #333;
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .modal-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .modal-content li {
+            padding-left: 30px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .modal-content li:before {
+            content: "💕";
+            position: absolute;
+            left: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            color: #e91e63;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        /* Galería estilo Instagram */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #efefef;
+        }
+
+        .gallery-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e91e63, #ff6b9d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .gallery-username {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .gallery-slider {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .gallery-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .gallery-nav:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-prev {
+            left: 10px;
+        }
+
+        .gallery-next {
+            right: 10px;
+        }
+
+        .gallery-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 15px;
+            background: #fff;
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dbdbdb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-dot.active {
+            background: #e91e63;
+            transform: scale(1.2);
+        }
+
+        .gallery-caption {
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #efefef;
+        }
+
+        .gallery-likes {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .gallery-text {
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .gallery-text strong {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .initial-screen h1 {
+                font-size: 2em;
+            }
+
+            .envelope-screen h1 {
+                font-size: 2em;
+            }
+
+            .envelopes-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Corazones flotantes -->
+    <div class="hearts" id="hearts"></div>
+
+    <!-- Pantalla inicial -->
+    <div class="initial-screen" id="initialScreen">
+        <h1>Brisa Maria❤️</h1>
+        <p>Aunque estemos lejos, mi amor por ti no conoce distancias...</p>
+        <p style="font-size: 1.5em; color: #e91e63; font-weight: bold;">¿Quieres ser mi San Valentín?</p>
+        <div class="button-container">
+            <button class="btn btn-yes" onclick="showEnvelopes()">¡Sí! 💕</button>
+            <button class="btn btn-no" id="btnNo">No</button>
+        </div>
+    </div>
+
+    <!-- Pantalla de sobres -->
+    <div class="envelope-screen" id="envelopeScreen">
+        <h1>¡Sabía que dirías que sí! 💕</h1>
+        <p class="subtitle">He preparado 7 sobres especiales para ti. Abre cada uno cuando quieras...</p>
+        
+        <div class="envelopes-container">
+            <div class="envelope" onclick="openEnvelope(1)">
+                <span class="envelope-icon">💌</span>
+                <div class="envelope-title">Razones por las que te amo</div>
+                <div class="envelope-description">Haz clic para descubrir...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(2)">
+                <span class="envelope-icon">📸</span>
+                <div class="envelope-title">Nuestros mejores momentos</div>
+                <div class="envelope-description">Recuerdos que atesoro...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(3)">
+                <span class="envelope-icon">💭</span>
+                <div class="envelope-title">Lo que más extraño de ti</div>
+                <div class="envelope-description">Cada día pienso en esto...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(4)">
+                <span class="envelope-icon">🤝</span>
+                <div class="envelope-title">Promesas para ti</div>
+                <div class="envelope-description">Mi compromiso contigo...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(5)">
+                <span class="envelope-icon">😊</span>
+                <div class="envelope-title">Para hacerte sonreír</div>
+                <div class="envelope-description">Porque tu sonrisa es todo...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(6)">
+                <span class="envelope-icon">✈️</span>
+                <div class="envelope-title">Cuando nos veamos</div>
+                <div class="envelope-description">Planes y sueños juntos...</div>
+            </div>
+
+            <div class="envelope" onclick="openEnvelope(7)">
+                <span class="envelope-icon">📸</span>
+                <div class="envelope-title">Fotos que amo de ti</div>
+                <div class="envelope-description">Cada una es especial...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Crear corazones flotantes
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💝', '💘'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+
+        // Botón "No" que se mueve
+        const btnNo = document.getElementById('btnNo');
+        let noClickCount = 0;
+
+        btnNo.addEventListener('click', function(e) {
+            e.preventDefault();
+            noClickCount++;
+            
+            if (noClickCount === 1) {
+                btnNo.textContent = '¿Segura? 🥺';
+            } else if (noClickCount === 2) {
+                btnNo.textContent = 'Por favor... 💔';
+            } else {
+                btnNo.style.display = 'none';
+            }
+        });
+
+        // Mostrar pantalla de sobres
+        function showEnvelopes() {
+            document.getElementById('initialScreen').classList.add('hidden');
+            document.getElementById('envelopeScreen').style.display = 'block';
+        }
+
+        // Contenido de cada sobre
+        const envelopeContents = {
+            1: {
+                title: "Razones por las que te amo mi Tomatita hermosa❤️",
+                content: `
+                    <ul>
+                        <li>Tu sonrisa ilumina incluso mis días más oscuros, aunque sea a través de una pantalla</li>
+                        <li>La forma en que me escuchas y me entiendes a pesar de que hablo aveces un poco mal </li>
+                        <li>Tu risa contagiosa que puedo escuchar en mi mente cuando más te extraño</li>
+                        <li>Cómo haces que la distancia se sienta pequeña con tu amor</li>
+                        <li>Tu fuerza y valentía para mantener esta relación a pesar de los kilómetros </li>
+                        <li>Los pequeños detalles que tienes conmigo, incluso desde lejos</li>
+                        <li>La forma en que me haces querer ser mejor persona cada día </li>
+                        <li>Cómo conviertes los momentos ordinarios en extraordinarios</li>
+                        <li>Tu paciencia y comprensión cuando las cosas se ponen difíciles</li>
+                        <li>Simplemente por ser tú, mi Maria perfecta</li>
+                    </ul>
+                `
+            },
+            2: {
+                title: "Nuestros mejores momentos mi Argentina chee📸",
+                content: `
+                    <p>Cada momento contigo es especial, pero estos se quedarán en mi corazón para siempre:</p>
+                    <ul>
+                        <li>La primera vez que hablamos y fue por un juegos frefire  y supe que eras especial  </li>
+                        <li>Nuestras videollamadas hasta altas horas de la madrugada y jugando frefire </li>
+                        <li>Cuando me cuentas chiste que no entinedo pero me haces reír igual</li>
+                        <li>Las veces que hemos visto el mismo atardecer, cada uno desde su lugar</li>
+                        <li>Cada "buenos días" y "buenas noches" que compartimos</li>
+                        <li>Cuando superamos juntos ese momento difícil las idas y vueltas</li>
+                        <li>Las canciones que me cantas y que se quedan en mi mente</li>
+                        <li>Cada plan que hacemos para nuestro futuro juntos</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "Lo que más quisera de ti princesa💭",
+                content: `
+                    <p>La distancia me hace valorar aún más cada parte de ti:</p>
+                    <ul>
+                        <li>Tu presencia física, poder abrazarte cuando quiera</li>
+                        <li>Ver tus expresiones en vivo, no solo por cámara</li>
+                        <li>Caminar juntos y tomarnos de la mano</li>
+                        <li>Compartir comidas y probar cosas nuevas juntos</li>
+                        <li>Escuchar tu voz sin la interferencia de internet</li>
+                        <li>Tus abrazos  que tanto necesito</li>
+                        <li>Despertarme y verte a mi lado</li>
+                        <li>Los pequeños momentos cotidianos que ahora parecen tan especiales</li>
+                    </ul>
+                    <p style="margin-top: 20px; font-style: italic; text-align: center;">Pero aunque te extraño, cada día de espera vale la pena porque es un día más cerca de estar juntos.</p>
+                `
+            },
+            4: {
+                title: "Promesas para ti Hermosa 🤝",
+                content: `
+                    <p>Te prometo...</p>
+                    <ul>
+                        <li>Amarte cada día más, sin importar la distancia</li>
+                        <li>Mateo 18:19 dice Cuando eva ora por el y tu oras por ella Dios hace que todo sea posible </li>
+                        <li>Estar ahí para ti siempre que me necesites</li>
+                        <li>Seguir haciéndote reír incluso en tus peores días</li>
+                        <li>Nunca dejar que la distancia apague nuestra llama</li>
+                        <li>Valorar cada momento que pasamos juntos, virtual o presencial</li>
+                        <li>Trabajar cada día para que nuestro futuro juntos sea realidad</li>
+                        <li>Ser tu apoyo, tu confidente y tu mejor amigo</li>
+                        <li>Celebrar cada pequeño logro tuyo como si fuera mío</li>
+                        <li>Mantener viva la chispa con detalles como este</li>
+                        <li>Nunca dejar de demostrarte cuánto significas para mí</li>
+                        
+                    </ul>
+                `
+            },
+            5: {
+                title: "Para hacerte sonreír 😊",
+                content: `
+                    <p>Algunas cosas que quiero que sepas:</p>
+                    <ul>
+                        <li>Eres la razón por la que reviso mi teléfono con una sonrisa</li>
+                        <li>Cuando me preguntan "¿qué te hace feliz?", lo primero que pienso es en ti</li>
+                        <li>A veces sonrío como tonto solo pensando en ti (y la gente me mira raro)</li>
+                        <li>Tu nombre es mi palabra favorita</li>
+                        <li>Cuento los días para poder verte, literalmente para casarnos y que los años sean menos</li>
+                        <li>Hasta la distancia se pone celosa de lo que tenemos</li>
+                        <li>Eres mi lugar favorito, aunque sea virtual</li>
+                        <li>Si el amor a distancia fuera una competencia, ya habríamos ganado y dpor años consecutivos</li>
+                    </ul>
+                    <p style="margin-top: 20px; text-align: center; font-size: 1.3em; color: #e91e63;">¡Te amo, Brisa! 💕</p>
+                `
+            },
+            6: {
+                title: "Cuando nos veamos mi Chinita Hermosa ✈️",
+                content: `
+                    <p>Estos son algunos de los planes que tengo para cuando finalmente estemos juntos:</p>
+                    <ul>
+                        <li>Un abrazo interminable en el aeropuerto (prepárate para no soltarte)</li>
+                        <li>Caminar sin rumbo, simplemente disfrutando estar juntos</li>
+                        <li>Salir a comer a diferentes lugares </li>
+                        <li>Ver el atardecer juntos, al fin en el mismo lugar y si estamos en Perú un aterdecer en la playa</li>
+                        <li>Una maratón de películas acurrucados en el sofá</li>
+                        <li>Cocinar juntos (aunque quememos algo, será perfecto)</li>
+                        <li>Tomarnos todas las fotos que no pudimos tomar antes</li>
+                        <li>Cumplir todos esos planes que hemos estado haciendo</li>
+                        <li>Simplemente estar juntos, sin pantallas de por medio</li>
+                    </ul>
+                    <p style="margin-top: 20px; font-style: italic; text-align: center; color: #e91e63;">
+                        La distancia es temporal, pero nuestro amor es para siempre. 
+                        Cada día estamos más cerca de estar juntos. Te amo con todo mi corazón. ❤️
+                    </p>
+                `
+            },
+            7: {
+                title: "Fotos que amo de ti mi guapaaa 📸",
+                content: `
+                    <p style="text-align: center; margin-bottom: 20px;">Cada foto tuya es especial, pero estas son algunas de mis favoritas...</p>
+                    <div class="gallery-container">
+                        <div class="gallery-header">
+                            <div class="gallery-avatar">B</div>
+                            <div class="gallery-username">brisa ❤️</div>
+                        </div>
+                        <div class="gallery-slider">
+                            <div class="gallery-slides" id="gallerySlides">
+                                <div class="gallery-slide"><img src="fotos/foto8.jpg" alt="Foto 1"></div>
+                                <div class="gallery-slide"><img src="fotos/foto5.jpg" alt="Foto 2"></div>
+                                <div class="gallery-slide"><img src="fotos/foto7.jpg" alt="Foto 3"></div>
+                                <div class="gallery-slide"><img src="fotos/foto1.jpg" alt="Foto 4"></div>
+                                <div class="gallery-slide"><img src="fotos/foto2.jpg" alt="Foto 5"></div>
+                                <div class="gallery-slide"><img src="fotos/foto3.jpg" alt="Foto 6"></div>
+                                <div class="gallery-slide"><img src="fotos/foto4.jpg" alt="Foto 7"></div>
+                                <div class="gallery-slide"><img src="fotos/foto6.jpg" alt="Foto 8"></div>
+                                <div class="gallery-slide"><img src="fotos/foto9.jpg" alt="Foto 9"></div>
+                            </div>
+                            <button class="gallery-nav gallery-prev" onclick="changeSlide(-1)">‹</button>
+                            <button class="gallery-nav gallery-next" onclick="changeSlide(1)">›</button>
+                        </div>
+                        <div class="gallery-indicators" id="galleryIndicators"></div>
+                        <div class="gallery-caption">
+                            <div class="gallery-likes">❤️ Me encantas en cada foto todo Linda cheee</div>
+                            <div class="gallery-text">
+                                <strong>Tú</strong> Cada una de estas fotos me recuerda por qué me enamoré de ti. Tu sonrisa, tu mirada, tu esencia... Todo en ti es perfecto para mí. 💕
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentSlide = 0;
+        const totalSlides = 9;
+
+        function initGallery() {
+            const indicators = document.getElementById('galleryIndicators');
+            if (!indicators) return;
+            
+            indicators.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+                dot.onclick = () => goToSlide(i);
+                indicators.appendChild(dot);
+            }
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            updateGallery();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateGallery();
+        }
+
+        function updateGallery() {
+            const slides = document.getElementById('gallerySlides');
+            const dots = document.querySelectorAll('.gallery-dot');
+            
+            if (slides) {
+                slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+            
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Abrir sobre
+        function openEnvelope(number) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+            const envelopeCards = document.querySelectorAll('.envelope');
+            
+            // Marcar sobre como abierto
+            envelopeCards[number - 1].classList.add('opened');
+            
+            // Mostrar contenido
+            const content = envelopeContents[number];
+            modalContent.innerHTML = `
+                <h2>${content.title}</h2>
+                ${content.content}
+            `;
+            
+            modal.classList.add('show');
+            
+            // Inicializar galería si es el sobre 7
+            if (number === 7) {
+                currentSlide = 0;
+                setTimeout(initGallery, 100);
+            }
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Inicializar
+        createHearts();
+    </script>
+</body>
+</html>
